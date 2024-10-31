@@ -23,6 +23,9 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.blogpersonal.data.UserDataStore
 import com.example.blogpersonal.ui.theme.BlogPersonalTheme
+import com.example.blogpersonal.navigation.NavGraph
+import com.google.firebase.auth.FirebaseAuth
+import com.example.blogpersonal.navigation.Routes
 import com.example.blogpersonal.screens.SaveDataScreen
 import com.example.blogpersonal.screens.ShowDataScreen
 
@@ -34,12 +37,27 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             BlogPersonalTheme {
-                SharedStorageApp(modifier = Modifier.fillMaxSize(),
-                    userDataStore = userDataStore)
+                //SharedStorageApp(modifier = Modifier.fillMaxSize(),
+                //    userDataStore = userDataStore)
+                BlogApp()
             }
         }
     }
 }
+
+@Composable
+fun BlogApp() {
+    val navController = rememberNavController()
+    val startDestination = if (FirebaseAuth.getInstance().currentUser == null) {
+        Routes.LOGIN
+    } else {
+        Routes.SAVEDATA
+    }
+
+    NavGraph(navController = navController, startDestination = startDestination)
+}
+
+/*
 @Composable
 fun SharedStorageApp(modifier: Modifier = Modifier, userDataStore:
 UserDataStore){
@@ -94,3 +112,4 @@ fun BottomNavigationBar(navController: NavController) {
         }
     }
 }
+ */

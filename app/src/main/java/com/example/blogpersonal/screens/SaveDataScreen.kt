@@ -14,9 +14,14 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import java.util.*
 import com.example.blogpersonal.data.UserDataStore
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
-fun SaveDataScreen(userDataStore: UserDataStore) {
+fun SaveDataScreen(
+    userDataStore: UserDataStore,
+    onLogout: () -> Unit
+) {
+    val auth = FirebaseAuth.getInstance()
     val coroutineScope = rememberCoroutineScope()
     var showDialog by remember { mutableStateOf(false) }
 // State variables for form inputs
@@ -82,6 +87,13 @@ fun SaveDataScreen(userDataStore: UserDataStore) {
             showDialog = true
         }) {
             Text("Save")
+        }
+
+        Button(onClick = {
+            auth.signOut()  // Cierra sesión en Firebase
+            onLogout()      // Llama al callback para volver al LoginScreen
+        }) {
+            Text("Logout")
         }
     }
     // Dialog to indicate success

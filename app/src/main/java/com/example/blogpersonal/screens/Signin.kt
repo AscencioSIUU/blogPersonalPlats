@@ -25,35 +25,18 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.example.blogpersonal.viewmodel.AuthViewModel
 import com.example.blogpersonal.data.Result
+import com.google.firebase.auth.FirebaseAuth
+import kotlin.concurrent.timerTask
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
-    authViewModel: AuthViewModel,
     onNavigateToSignUp: () -> Unit,
-    onSignInSuccess:()->Unit
-
+    onLoginSuccess: () -> Unit
 ) {
+    val auth = FirebaseAuth.getInstance()
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-
-    val result by authViewModel.authResult.observeAsState()
-
-    if (!authViewModel.alreadyLoggedIn.value) {
-        when (result) {
-            is Result.Success->{
-                onSignInSuccess()
-                authViewModel.alreadyLoggedIn.value = true
-            }
-            is Result.Error ->{
-
-            }
-            else -> {
-
-            }
-        }
-    }
-
 
     Column(
         modifier = Modifier
@@ -81,7 +64,13 @@ fun LoginScreen(
         )
         Button(
             onClick = {
-                authViewModel.login(email, password)
+                auth.signInWithEmailAndPassword(email, password).addOnCompleteListener{ task ->
+                    if (task.isSuccessful) {
+                        onLoginSuccess()
+                    } else {
+                        // Manejar error
+                    }
+                }
             },
             modifier = Modifier
                 .fillMaxWidth()

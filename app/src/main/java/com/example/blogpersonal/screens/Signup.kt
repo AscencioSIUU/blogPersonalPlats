@@ -23,15 +23,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.google.firebase.auth.FirebaseAuth
 import com.example.blogpersonal.viewmodel.AuthViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignUpScreen(
-    authViewModel: AuthViewModel,
+    onSignUpSuccess: () -> Unit,
     onNavigateToLogin: () -> Unit
 ){
-
+    val auth = FirebaseAuth.getInstance()
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var firstName by remember { mutableStateOf("") }
@@ -71,11 +72,13 @@ fun SignUpScreen(
         )
         Button(
             onClick = {
-                authViewModel.signUp(email, password, firstName, lastName)
-                email = ""
-                password = ""
-                firstName = ""
-                lastName = ""
+                auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        onSignUpSuccess()  // Llama al callback cuando el registro es exitoso
+                    } else {
+                        // Maneja el error
+                    }
+                }
             },
             modifier = Modifier.fillMaxWidth().padding(8.dp)
         ) {
